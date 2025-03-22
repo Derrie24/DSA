@@ -1,0 +1,68 @@
+Algorithm SOM_TSP
+Input: List of city coordinates C = {c1, c2, ..., cn}
+       Number of neurons m (equal to number of cities)
+       Initial learning rate η₀, initial neighborhood radius σ₀
+       Maximum number of iterations max_epochs
+Output: Approximate TSP route
+
+1. Initialize Hyperparameters
+   max_epochs ← 1000                  // Total training iterations  
+   η₀ ← 0.8                            // Initial learning rate  
+   σ₀ ← ⌊m/2⌋                          // Initial neighborhood radius  
+   m ← |C|                             // Number of neurons (same as number of cities)  
+
+2. Initialize Neurons  
+   Place m neurons randomly in 2D space or along a circular path  
+
+3. Training Loop  
+   for epoch ← 1 to max_epochs do:  
+       η ← η₀ * (1 - epoch / max_epochs)      // Decay learning rate  
+       σ ← σ₀ * (1 - epoch / max_epochs)      // Decay neighborhood radius  
+       
+       Shuffle cities to avoid bias  
+       
+       for each city ci in C do:  
+           // Step 1: Find Winning Neuron  
+           winner_index ← argmin d(ci, neurons[j]) for j in 0 to m-1  
+           
+           // Step 2: Update Winner and Neighbors  
+           for j ← 0 to m-1 do:  
+               distance_to_winner ← min(|j - winner_index|, m - |j - winner_index|)  
+               
+               if distance_to_winner ≤ σ then:  
+                   influence ← exp(-distance_to_winner² / (2 * σ²))  
+                   
+                   // Move neuron towards city  
+                   neurons[j].x ← neurons[j].x + η * influence * (ci.x - neurons[j].x)  
+                   neurons[j].y ← neurons[j].y + η * influence * (ci.y - neurons[j].y)  
+
+4. Extract Final Route  
+   Sort neurons based on their position in the 1D ring topology  
+   route ← []  
+   for each neuron in neurons do:  
+       closest_city ← find_closest_city(neuron, C)  
+       route.append(closest_city)  
+
+   route ← remove_duplicates(route)  
+   route.append(route[0])   // Close the tour  
+
+5. Compute Total Distance  
+   total_distance ← 0  
+   for i ← 0 to |route|-2 do:  
+       total_distance += euclidean_distance(route[i], route[i+1])  
+
+6. Output Results  
+   print("Final Route:", route)  
+   print("Total Distance:", total_distance)  
+
+---
+
+Key Functions
+Function euclidean_distance(a, b):  
+    return sqrt((a.x - b.x)² + (a.y - b.y)²)  
+
+Function find_closest_city(neuron, cities):  
+    return city with min euclidean_distance(neuron, city)  
+
+Function remove_duplicates(route):  
+    return route with each city appearing exactly once  
