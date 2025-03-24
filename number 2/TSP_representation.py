@@ -1,4 +1,5 @@
 #Adjacency list representation.
+#A value of 0 means no direct path exists between those cities
 graph = {
     1: [(2, 12), (3, 10), (7, 12)], #City 1 connects to city 2, 3 and 7 by 12, 10 and 12 distances respectively.
     2: [(1, 12), (3, 8), (4, 12)], #city 2 connects to city 1, 3 and 4 by 12, 8, and 12 distances respectively
